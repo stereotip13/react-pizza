@@ -10,7 +10,7 @@ const INIT_STATE = {
 }
 
 //fgbir
-const API = 'http://localhost:8001/pizzas'
+const API = 'http://localhost:8000/pizzas'
 
 const reducer = (state = INIT_STATE, action) => {
   switch (action.type) {
@@ -45,7 +45,7 @@ const PizzaContextProvider = ({ children }) => {
       payload: result,
     })
   }
-  async function addPizzas(newPizza) {
+  async function addPizza(newPizza) {
     await axios.post(API, newPizza)
     getPizzas() //вызываем ф-цию, чтобы получить уже новый список пицц
   }
@@ -62,7 +62,7 @@ const PizzaContextProvider = ({ children }) => {
     })
   }
   async function editPizza(id, newPizza) {
-    axios.put(`${API}/${id}`, newPizza)
+    await axios.put(`${API}/${id}`, newPizza)
     getPizzas()
   }
   return (
@@ -70,7 +70,7 @@ const PizzaContextProvider = ({ children }) => {
       value={{
         pizzas: state.pizzas,
         onePizza: state.onePizza,
-        addPizzas,
+        addPizza,
         editPizza,
         getOnePizza,
         deletePizza,

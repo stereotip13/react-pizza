@@ -1,29 +1,22 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import { data } from '../helpers/data'
 import TextField from '@mui/material/TextField'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
-import { pizzaContext } from '../context/PizzaContext'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import { data } from '../helpers/data.js'
+import { pizzaContext } from '../context/PizzaContext.js'
 
-export default function Home() {
+const Home = () => {
   const [isModal, setIsModal] = useState(false)
   const [editModal, setEditModal] = useState(false)
-  const {
-    addPizza,
-    getPizzas,
-    pizzas,
-    deletePizza,
-    getOnePizza,
-    editPizza,
-    onePizza,
-  } = useContext(pizzaContext)
   const [newPizza, setNewPizza] = useState({
     name: '',
     price: 0,
@@ -38,42 +31,54 @@ export default function Home() {
     image: '',
     id: Date.now(),
   })
+  //с помощью хука юзконтекст подключаем контекс из пица контекст провайдер
+  const {
+    addPizza,
+    getPizzas,
+    pizzas,
+    deletePizza,
+    getOnePizza,
+    editPizza,
+    onePizza,
+  } = useContext(pizzaContext)
   useEffect(() => {
     getPizzas()
   }, [])
-
+  //получаем onePizza, изначально onePizza = null, поэтому ставим знак ?, чтобы реакт искал значение, и если его нет выводил какое есть
+  useEffect(() => {
+    setEditedPizza({
+      name: onePizza?.name || '',
+      price: onePizza?.price || 0,
+      description: onePizza?.description || '',
+      image: onePizza?.image || '',
+      id: onePizza?.id || Date.now(),
+    })
+  }, [onePizza])
+  //добавление данных на форме
   function handleEdit() {
     editPizza(onePizza.id, editedPizza)
-    setEditModal(false)
+    setEditModal(false) //закрываем модалку, ниже обнуляем все, что было прописано
     setEditedPizza({
       name: '',
       price: 0,
       description: '',
       image: '',
-      id: Date.now(),
+      id: '',
     })
   }
 
-  useEffect(() => {
-    setEditedPizza({
-      name: !onePizza ? '' : onePizza.name,
-      price: !onePizza ? '' : onePizza.price,
-      description: !onePizza ? '' : onePizza.description,
-      image: !onePizza ? '' : onePizza.image,
-      id: !onePizza ? '' : Date.now(),
-    })
-  }, [onePizza])
+  //меняется значение изМодал окно открывается и закрывается
   function handleClose() {
     setIsModal(false)
   }
-
+  //закрываем модалку по редактиованию
   function editHandleClose() {
     setEditModal(false)
   }
-
   function handleAdd() {
     addPizza(newPizza)
-    setIsModal(false)
+    setIsModal(false) //закрываем модалку
+    //обнуляем содержимое модалки, чтобы не сохранялось
     setNewPizza({
       name: '',
       price: 0,
@@ -88,20 +93,24 @@ export default function Home() {
         style={{ display: 'flex', justifyContent: 'flex-end', margin: '10px' }}
       >
         <Button
-          variant="contained"
+          variant="outlined"
           size="large"
           onClick={() => setIsModal(true)}
         >
-          Add Pizza
+          Add Pazza
         </Button>
       </div>
       <div
         style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}
       >
+        {/* //специальный див для инлайновых стилей, скачал пример карточки, обернул в
+    див, в кот указал стили инлайново если не хотим исп-ть слово return, то
+    используем скобку ()     */}
         {pizzas.map((pizza) => (
           <Card key={pizza.id} sx={{ maxWidth: 345, margin: '10px' }}>
+            {/* при использовании мар обязательно указывать key */}
             <CardMedia
-              sx={{ height: 300 }}
+              sx={{ height: 345 }}
               image={pizza.image}
               title={pizza.name}
             />
@@ -115,10 +124,7 @@ export default function Home() {
             </CardContent>
             <CardActions>
               <Button
-                onClick={() => {
-                  setEditModal(true)
-                  getOnePizza(pizza.id)
-                }}
+                onClick={(() => getOnePizza(pizza.id), setEditModal(true))}
                 size="small"
               >
                 Edit
@@ -131,7 +137,12 @@ export default function Home() {
         ))}
       </div>
       <Dialog open={isModal} onClose={handleClose}>
+        <DialogTitle>Subscribe</DialogTitle>
         <DialogContent>
+          <DialogContentText>
+            To subscribe to this website, please enter your email address here.
+            We will send updates occasionally.
+          </DialogContentText>
           <TextField
             autoFocus
             autoComplete="off"
@@ -145,8 +156,8 @@ export default function Home() {
           />
           <TextField
             autoFocus
-            autoComplete="off"
             margin="dense"
+            autoComplete="off"
             id="name"
             label="Price"
             type="number"
@@ -172,9 +183,9 @@ export default function Home() {
           <TextField
             autoFocus
             margin="dense"
-            autoComplete="off"
             id="name"
-            label="Image address"
+            autoComplete="off"
+            label="Image Address"
             type="text"
             fullWidth
             variant="standard"
@@ -189,7 +200,12 @@ export default function Home() {
         </DialogActions>
       </Dialog>
       <Dialog open={editModal} onClose={editHandleClose}>
+        <DialogTitle>Subscribe</DialogTitle>
         <DialogContent>
+          <DialogContentText>
+            To subscribe to this website, please enter your email address here.
+            We will send updates occasionally.
+          </DialogContentText>
           <TextField
             autoFocus
             autoComplete="off"
@@ -206,8 +222,8 @@ export default function Home() {
           />
           <TextField
             autoFocus
-            autoComplete="off"
             margin="dense"
+            autoComplete="off"
             id="name"
             label="Price"
             type="number"
@@ -235,9 +251,9 @@ export default function Home() {
           <TextField
             autoFocus
             margin="dense"
-            autoComplete="off"
             id="name"
-            label="Image address"
+            autoComplete="off"
+            label="Image Address"
             type="text"
             fullWidth
             variant="standard"
@@ -255,3 +271,5 @@ export default function Home() {
     </>
   )
 }
+
+export default Home
